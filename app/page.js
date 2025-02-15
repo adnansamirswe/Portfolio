@@ -20,34 +20,32 @@ import GradientBackground from '@/components/GradientBackground';
 
 const projects = [
   {
-    title: "AI-Powered Analytics Dashboard",
-    description: "A modern analytics platform with real-time data visualization",
-    image: "https://cdn.dribbble.com/users/1615584/screenshots/15571949/media/4ea6b4e6e3bf876757c6767b2ac7d1f0.jpg",
-    tech: ["React", "Next.js", "TailwindCSS", "Python"]
+    title: "Blog Site",
+    description: "A modern blog platform with dynamic content management",
+    image: "/blog-preview.png",  // Must exactly match your file name in public folder
+    tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
+    link: "https://blogsiteportfolio.vercel.app/"
   },
   {
     title: "E-Commerce Platform",
-    description: "Full-featured online shopping platform with AR product preview",
-    image: "https://cdn.dribbble.com/users/1615584/screenshots/17434745/media/af79c5cd05bb6f3d589bdb0ddb76682f.jpg",
-    tech: ["React", "Node.js", "MongoDB", "Stripe"]
+    description: "Full-featured online shopping platform with modern UI",
+    image: "/ecommerce-preview.png",  // Must exactly match your file name in public folder
+    tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
+    link: "https://ecommerce-nine-ecru-76.vercel.app/"
   },
   {
-    title: "Social Media Manager",
-    description: "All-in-one social media management and analytics tool",
-    image: "https://cdn.dribbble.com/users/1615584/screenshots/16178409/media/e3c467ebd826864727417eeeccaa4a6c.jpg",
-    tech: ["Next.js", "GraphQL", "AWS", "Firebase"]
+    title: "Event Website",
+    description: "Dynamic event management and booking platform",
+    image: "/event-preview.png",  // Must exactly match your file name in public folder
+    tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
+    link: "https://event-website-beta.vercel.app/"
   },
   {
-    title: "Crypto Trading Platform",
-    description: "Real-time cryptocurrency trading with advanced charts",
-    image: "https://cdn.dribbble.com/users/1615584/screenshots/15012657/media/be7728d99e0838043a601bd99d75b061.jpg",
-    tech: ["React", "TypeScript", "WebSocket", "D3.js"]
-  },
-  {
-    title: "Smart Home IoT Dashboard",
-    description: "Connected home control system with AI integration",
-    image: "https://cdn.dribbble.com/users/1615584/screenshots/16753965/media/102ca8c89f0f6e962508871201b49e45.jpg",
-    tech: ["React", "Next.js", "MQTT", "TensorFlow.js"]
+    title: "Gym Landing Page",
+    description: "Modern and responsive gym website with animations",
+    image: "/gym-preview.png",  // Must exactly match your file name in public folder
+    tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
+    link: "https://gym-landing-page-rose.vercel.app/"
   }
 ];
 
@@ -189,14 +187,21 @@ export default function Home() {
             >
               <HoverCard>
                 <HoverCardTrigger asChild>
-                  <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 backdrop-blur-sm">
+                  <Card 
+                    className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 backdrop-blur-sm cursor-pointer"
+                    onClick={() => window.open(project.link, '_blank')}
+                  >
                     <CardHeader className="p-0 relative group">
                       <Image
                         src={project.image}
                         alt={project.title}
                         width={600}
                         height={400}
+                        priority={index === 0}
                         className="w-full h-48 object-cover rounded-t-lg"
+                        onError={(e) => {
+                          e.target.src = `https://placehold.co/600x400/1a1b1c/31b237/png?text=${encodeURIComponent(project.title)}`
+                        }}
                       />
                       <div className="absolute inset-0 bg-green-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-lg" />
                     </CardHeader>
