@@ -95,13 +95,10 @@ export default function Home() {
               Adnan Samir
             </h1>
             <p className="text-2xl text-gray-400 mb-2">React & Next.js Developer</p>
-            <div className="flex items-center justify-center gap-1 text-sm text-gray-400 mb-4">
+            <div className="flex items-center justify-center gap-1 text-sm text-gray-400 mb-4 mt-4">
               <MapPin className="w-3 h-3" />
               <span>Bangladesh</span>
             </div>
-            <p className="max-w-2xl mx-auto text-gray-400 text-lg">
-              I&apos;m a full-stack developer creating innovative and user-friendly web applications with React and Next.js.
-            </p>
           </motion.div>
           
           <div className="flex gap-4 justify-center mt-8">
