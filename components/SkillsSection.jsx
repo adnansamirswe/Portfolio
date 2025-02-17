@@ -1,11 +1,48 @@
 'use client';
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { 
+  FaReact, 
+  FaNodeJs, 
+  FaGitAlt, 
+  FaDocker, 
+  FaAws, 
+  FaPython 
+} from "react-icons/fa";
+import { 
+  SiNextdotjs, 
+  SiTypescript, 
+  SiTailwindcss, 
+  SiFramer,
+  SiExpress, 
+  SiPostgresql, 
+  SiMongodb 
+} from "react-icons/si";
+import { TbApi } from "react-icons/tb";
+import { VscGithubAction } from "react-icons/vsc";
 
 const skills = {
-  "Frontend": ["React", "Next.js", "TypeScript", "TailwindCSS", "Framer Motion"],
-  "Backend": ["Node.js", "Express", "PostgreSQL", "MongoDB", "REST APIs", "Python"],
-  "Tools & Others": ["Git", "Docker", "AWS", "CI/CD"]
+  "Frontend": [
+    { name: "React", icon: <FaReact className="text-[#61DAFB]" /> },
+    { name: "Next.js", icon: <SiNextdotjs className="text-white" /> },
+    { name: "TypeScript", icon: <SiTypescript className="text-[#3178C6]" /> },
+    { name: "TailwindCSS", icon: <SiTailwindcss className="text-[#06B6D4]" /> },
+    { name: "Framer Motion", icon: <SiFramer className="text-[#FF5757]" /> }
+  ],
+  "Backend": [
+    { name: "Node.js", icon: <FaNodeJs className="text-[#339933]" /> },
+    { name: "Express", icon: <SiExpress className="text-white" /> },
+    { name: "PostgreSQL", icon: <SiPostgresql className="text-[#336791]" /> },
+    { name: "MongoDB", icon: <SiMongodb className="text-[#47A248]" /> },
+    { name: "REST APIs", icon: <TbApi className="text-[#FF5757]" /> },
+    { name: "Python", icon: <FaPython className="text-[#3776AB]" /> }
+  ],
+  "Tools & Others": [
+    { name: "Git", icon: <FaGitAlt className="text-[#F05032]" /> },
+    { name: "Docker", icon: <FaDocker className="text-[#2496ED]" /> },
+    { name: "AWS", icon: <FaAws className="text-[#FF9900]" /> },
+    { name: "CI/CD", icon: <VscGithubAction className="text-white" /> }
+  ]
 };
 
 export default function SkillsSection() {
@@ -32,14 +69,16 @@ export default function SkillsSection() {
             <div className="flex flex-wrap gap-3">
               {categorySkills.map((skill, index) => (
                 <motion.span
-                  key={skill}
+                  key={skill.name}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3, delay: (categoryIndex * 0.1) + (index * 0.05) }}
                   className="px-4 py-2 rounded-lg bg-gray-700/30 text-gray-300 hover:text-green-400 
-                           hover:bg-gray-700/50 transition-all duration-300 cursor-default"
+                           hover:bg-gray-700/50 transition-all duration-300 cursor-default
+                           flex items-center gap-2"
                 >
-                  {skill}
+                  <span className="text-xl">{skill.icon}</span>
+                  {skill.name}
                 </motion.span>
               ))}
             </div>
