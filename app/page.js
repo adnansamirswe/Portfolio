@@ -20,6 +20,13 @@ import GradientBackground from '@/components/GradientBackground';
 
 const projects = [
   {
+    title: "SaaS Landing Page",
+    description: "Modern SaaS product landing page with elegant design",
+    image: "/saas-preview.png",  // Make sure to add this image to your public folder
+    tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
+    link: "https://saas-product-landing-page-two.vercel.app/"
+  },
+  {
     title: "Blog Site",
     description: "A modern blog platform with dynamic content management",
     image: "/blog-preview.png",  // Must exactly match your file name in public folder
