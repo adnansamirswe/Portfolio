@@ -19,6 +19,14 @@ import ScrollNav from "@/components/ScrollNav";
 import GradientBackground from '@/components/GradientBackground';
 
 const projects = [
+    {
+    title: "EzeSite - Website Builder",
+    description: "Ready-made template-based eCommerce website builder for quick business setup",
+    image: "/ezesite.png",  // Using the existing ezesite.png image
+    tech: ["Next.js", "TailwindCSS", "Node.js", "SQL", "Template Engine"],
+    link: "https://ezesite.com" // You can update this with the actual live URL when available
+  },
+  
   {
     title: "Modern Landing Page",
     description: "Clean and contemporary landing page with sleek animations",
