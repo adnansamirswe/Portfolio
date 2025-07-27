@@ -16,7 +16,8 @@ import {
   SiFramer,
   SiExpress, 
   SiPostgresql, 
-  SiMongodb 
+  SiMongodb, 
+  SiMysql 
 } from "react-icons/si";
 import { TbApi } from "react-icons/tb";
 import { VscGithubAction } from "react-icons/vsc";
@@ -34,6 +35,7 @@ const skills = {
     { name: "Express", icon: <SiExpress className="text-white" /> },
     { name: "PostgreSQL", icon: <SiPostgresql className="text-[#336791]" /> },
     { name: "MongoDB", icon: <SiMongodb className="text-[#47A248]" /> },
+    { name: "SQL", icon: <SiMysql className="text-yellow-400" /> },
     { name: "REST APIs", icon: <TbApi className="text-[#FF5757]" /> },
     { name: "Python", icon: <FaPython className="text-[#3776AB]" /> }
   ],

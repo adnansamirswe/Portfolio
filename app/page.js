@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import { HoverCard, HoverCardTrigger} from "@/components/ui/hover-card";
 import { Badge } from "@/components/ui/badge";
-import { Github, Linkedin, Mail, ExternalLink, CheckCircle2, MapPin } from "lucide-react";
+import { Github, Linkedin, Mail, CheckCircle2, MapPin } from "lucide-react";
 import ParticleBackground from "@/components/ParticleBackground";
 import SkillsSection from "@/components/SkillsSection";
 import React from "react";
@@ -22,52 +22,66 @@ const projects = [
     {
     title: "EzeSite - Website Builder",
     description: "Ready-made template-based eCommerce website builder for quick business setup",
-    image: "/ezesite.png",  // Using the existing ezesite.png image
+    image: "/ezesite.png",
     tech: ["Next.js", "TailwindCSS", "Node.js", "SQL", "Template Engine"],
-    link: "https://ezesite.com" // You can update this with the actual live URL when available
+    link: "https://ezesite.com",
+    client: false
   },
-  
+  {
+    title: "Visiotec Alchemy",
+    description: "IT solutions agency platform with a modern stack. Cloudflare D1 SQL backend, Node.js API, Vite + React + TypeScript + TailwindCSS frontend.",
+    image: "/visiotecalchemy-preview.png", // Add this image to your public folder for best results
+    tech: ["Vite", "React", "TypeScript", "TailwindCSS", "Node.js", "Cloudflare D1 (SQL)", "Cloudflare", "API"],
+    link: "https://visiotecalchemy.com/",
+    client: true
+  },
   {
     title: "Modern Landing Page",
     description: "Clean and contemporary landing page with sleek animations",
-    image: "/modern-landing-preview.png",  // Make sure to add this image to your public folder
+    image: "/modern-landing-preview.png",
     tech: ["Next.js", "TailwindCSS", "Framer Motion", "Responsive Design"],
-    link: "https://modernlandingpage-7pg3.vercel.app/"
+    link: "https://modernlandingpage-7pg3.vercel.app/",
+    client: false
   },
   {
     title: "SaaS Landing Page",
     description: "Modern SaaS product landing page with elegant design",
-    image: "/saas-preview.png",  // Make sure to add this image to your public folder
+    image: "/saas-preview.png",
     tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
-    link: "https://saas-product-landing-page-two.vercel.app/"
+    link: "https://saas-product-landing-page-two.vercel.app/",
+    client: false
   },
   {
     title: "Blog Site",
     description: "A modern blog platform with dynamic content management",
-    image: "/blog-preview.png",  // Must exactly match your file name in public folder
+    image: "/blog-preview.png",
     tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
-    link: "https://blogsiteportfolio.vercel.app/"
+    link: "https://blogsiteportfolio.vercel.app/",
+    client: false
   },
   {
     title: "E-Commerce Platform",
     description: "Full-featured online shopping platform with modern UI",
-    image: "/ecommerce-preview.png",  // Must exactly match your file name in public folder
+    image: "/ecommerce-preview.png",
     tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
-    link: "https://ecommerce-nine-ecru-76.vercel.app/"
+    link: "https://ecommerce-nine-ecru-76.vercel.app/",
+    client: false
   },
   {
     title: "Event Website",
     description: "Dynamic event management and booking platform",
-    image: "/event-preview.png",  // Must exactly match your file name in public folder
+    image: "/event-preview.png",
     tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
-    link: "https://event-website-beta.vercel.app/"
+    link: "https://event-website-beta.vercel.app/",
+    client: false
   },
   {
     title: "Gym Landing Page",
     description: "Modern and responsive gym website with animations",
-    image: "/gym-preview.png",  // Must exactly match your file name in public folder
+    image: "/gym-preview.png",
     tech: ["Next.js", "TailwindCSS", "Framer Motion", "Shadcn"],
-    link: "https://gym-landing-page-rose.vercel.app/"
+    link: "https://gym-landing-page-rose.vercel.app/",
+    client: false
   }
 ];
 
@@ -92,6 +106,11 @@ export default function Home() {
       console.error('Failed to copy:', err);
     }
   };
+
+  // Filter state for client projects
+  const [showClientsOnly, setShowClientsOnly] = React.useState(false);
+
+  const filteredProjects = showClientsOnly ? projects.filter(p => p.client) : projects;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
@@ -193,10 +212,18 @@ export default function Home() {
       <section id="projects" className="relative py-20 px-4 md:px-8 max-w-7xl mx-auto">
         <GradientBackground />
         <h2 className="text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600">
-          Featured Projects
+          My Projects
         </h2>
+        <div className="flex justify-center mb-8">
+          <button
+            className={`px-4 py-2 rounded-full border transition-colors duration-200 text-sm font-medium mr-2 ${showClientsOnly ? 'bg-green-500/80 text-white border-green-500' : 'bg-gray-800/60 text-gray-200 border-gray-700 hover:bg-green-500/20'}`}
+            onClick={() => setShowClientsOnly(!showClientsOnly)}
+          >
+            {showClientsOnly ? 'Show All Projects' : 'Show Only Client Projects'}
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project, index) => (
+          {filteredProjects.map((project, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -207,9 +234,13 @@ export default function Home() {
               <HoverCard>
                 <HoverCardTrigger asChild>
                   <Card 
-                    className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 backdrop-blur-sm cursor-pointer"
+                    className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-all duration-300 backdrop-blur-sm cursor-pointer relative"
                     onClick={() => window.open(project.link, '_blank')}
                   >
+                    {/* Client badge on top right */}
+                    {project.client && (
+                      <span className="absolute top-3 right-3 z-20 bg-transparent border border-green-400 text-xs font-semibold text-green-300 px-2 py-1 rounded-full shadow-md backdrop-blur-sm">Client</span>
+                    )}
                     <CardHeader className="p-0 relative group">
                       <Image
                         src={project.image}
@@ -225,7 +256,9 @@ export default function Home() {
                       <div className="absolute inset-0 bg-green-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-t-lg" />
                     </CardHeader>
                     <CardContent className="p-6">
-                      <h3 className="text-xl font-bold mb-2 text-green-400">{project.title}</h3>
+                      <div className="flex items-center mb-2">
+                        <h3 className="text-xl font-bold text-green-400 mr-2">{project.title}</h3>
+                      </div>
                       <p className="text-gray-400 mb-4">{project.description}</p>
                       <div className="flex flex-wrap gap-2">
                         {project.tech.map((tech, i) => (
@@ -237,14 +270,6 @@ export default function Home() {
                     </CardContent>
                   </Card>
                 </HoverCardTrigger>
-                <HoverCardContent className="w-80 bg-gray-800/90 border-gray-700 backdrop-blur-sm">
-                  <div className="flex justify-between space-x-4">
-                    <div>
-                      <h4 className="text-sm font-semibold">{project.title}</h4>
-                      <p className="text-sm text-gray-400">View project details →</p>
-                    </div>
-                  </div>
-                </HoverCardContent>
               </HoverCard>
             </motion.div>
           ))}
