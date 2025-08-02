@@ -10,9 +10,6 @@ import Red3DBackground from "@/components/Red3DBackground";
 import Enhanced3DCard from "@/components/Enhanced3DCard";
 import RedNeonButton from "@/components/RedNeonButton";
 import SkillsSection from "@/components/SkillsSection";
-import LoadingScreen from "@/components/LoadingScreen";
-import HackingTerminal from "@/components/HackingTerminal";
-import AsteroidTargetedText from "@/components/AsteroidTargetedText";
 import React from "react";
 import {
   Tooltip,
@@ -92,7 +89,6 @@ const projects = [
 export default function Home() {
   const [copied, setCopied] = React.useState(false);
   const [showEmail, setShowEmail] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
 
   const handleEmailClick = async () => {
     if (!showEmail) {
@@ -113,21 +109,13 @@ export default function Home() {
   };
 
   // Filter state for client projects
-  const filteredProjects = projects;
-
-  const handleLoadingComplete = () => {
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-    return <LoadingScreen onLoadingComplete={handleLoadingComplete} />;
-  }
+  const [showClientsOnly, setShowClientsOnly] = React.useState(false);
+  const filteredProjects = showClientsOnly ? projects.filter(p => p.client) : projects;
 
   return (
     <div className="min-h-screen bg-black-primary relative overflow-hidden">
       <Red3DBackground />
       <ScrollNav />
-      <HackingTerminal />
       
       {/* Hero Section */}
       <motion.section 
@@ -143,24 +131,16 @@ export default function Home() {
             transition={{ duration: 1, type: "spring", stiffness: 100 }}
             className="mb-8"
           >
-            <AsteroidTargetedText 
-              text="ADNAN_SAMIR"
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-6 tracking-wider"
-              asteroidCount={2}
-            />
+            <h1 className="text-8xl md:text-9xl font-black mb-6 neon-text gradient-text tracking-wider">
+              ADNAN SAMIR
+            </h1>
             <motion.div 
-              className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl mb-4 font-light tracking-wide"
+              className="text-3xl md:text-4xl text-white/90 mb-4 font-light tracking-wide"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              style={{ fontWeight: '300' }}
             >
-              <AsteroidTargetedText 
-                text="Full-Stack_Developer"
-                className="inline-block font-light"
-                asteroidCount={1}
-                highlightWord="Full-Stack"
-              />
+              <span className="text-red-neon">Elite</span> Full-Stack Developer
             </motion.div>
             <motion.div 
               className="flex items-center justify-center gap-2 text-red-neon/80 mb-8"
@@ -179,161 +159,54 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.6 }}
           >
-            {/* GitHub Button - Matrix Code Effect */}
-            <motion.button
+            <RedNeonButton 
+              variant="primary" 
+              size="lg"
               onClick={() => window.open('https://github.com/adnansamirswe', '_blank')}
-              className="group relative overflow-hidden bg-transparent border-2 border-red-neon text-red-neon hover:text-white font-bold px-6 py-2.5 text-base rounded-xl transition-all duration-500 cursor-pointer"
-              whileHover={{ 
-                scale: 1.05, 
-                y: -3,
-                boxShadow: '0 25px 50px rgba(255, 23, 68, 0.4), 0 0 80px rgba(255, 23, 68, 0.3)'
-              }}
-              whileTap={{ scale: 0.98 }}
+              className="group"
             >
-              {/* Matrix rain effect on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute text-green-400 text-xs font-mono"
-                    style={{ left: `${i * 12.5}%`, top: '-20px' }}
-                    animate={{
-                      y: ['-20px', '80px'],
-                      opacity: [0, 1, 0]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: i * 0.2,
-                      ease: 'linear'
-                    }}
-                  >
-                    {Math.random() > 0.5 ? '1' : '0'}
-                  </motion.div>
-                ))}
-              </div>
-              
-              {/* Background color transition */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-red-neon via-red-600 to-red-neon"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: '0%' }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-              />
-              
-              <span className="relative z-10 flex items-center">
-                <Github className="mr-2 h-4 w-4 group-hover:rotate-[360deg] transition-transform duration-700" /> 
-                GitHub
-              </span>
-            </motion.button>
+              <Github className="mr-3 h-5 w-5 group-hover:rotate-12 transition-transform" /> 
+              GitHub
+            </RedNeonButton>
             
-            {/* LinkedIn Button - Professional Pulse Effect */}
-            <motion.button
+            <RedNeonButton 
+              variant="secondary" 
+              size="lg"
               onClick={() => window.open('https://www.linkedin.com/in/adnan-samir-8887562a2/', '_blank')}
-              className="group relative overflow-hidden bg-transparent border-2 border-blue-400 text-blue-400 hover:text-white font-bold px-6 py-2.5 text-base rounded-xl transition-all duration-500 cursor-pointer"
-              whileHover={{ 
-                scale: 1.05, 
-                y: -3,
-                boxShadow: '0 25px 50px rgba(59, 130, 246, 0.4), 0 0 80px rgba(59, 130, 246, 0.3)'
-              }}
-              whileTap={{ scale: 0.98 }}
+              className="group"
             >
-              {/* Professional ripple effect */}
-              <motion.div
-                className="absolute inset-0 rounded-xl border-2 border-blue-400"
-                animate={{
-                  scale: [1, 1.2, 1.4],
-                  opacity: [0.5, 0.2, 0]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeOut'
-                }}
-              />
-              
-              {/* LinkedIn blue gradient */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400"
-                initial={{ scale: 0, borderRadius: '50%' }}
-                whileHover={{ scale: 1.5, borderRadius: '0%' }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
-              />
-              
-              <span className="relative z-10 flex items-center">
-                <Linkedin className="mr-2 h-4 w-4 group-hover:scale-125 group-hover:rotate-12 transition-transform duration-500" /> 
-                LinkedIn
-              </span>
-            </motion.button>
+              <Linkedin className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" /> 
+              LinkedIn
+            </RedNeonButton>
             
-            {/* Email Button - Envelope Opening Effect */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <motion.button
+                  <RedNeonButton 
+                    variant="ghost" 
+                    size="lg"
                     onClick={handleEmailClick}
-                    className={`group relative overflow-hidden bg-transparent border-2 border-purple-400 text-purple-400 hover:text-white font-bold px-6 py-2.5 text-base rounded-xl transition-all duration-500 cursor-pointer ${showEmail ? 'min-w-[250px]' : ''}`}
-                    whileHover={{ 
-                      scale: 1.05, 
-                      y: -3,
-                      boxShadow: '0 25px 50px rgba(168, 85, 247, 0.4), 0 0 80px rgba(168, 85, 247, 0.3)'
-                    }}
-                    whileTap={{ scale: 0.98 }}
+                    className={`transition-all duration-300 ${showEmail ? 'min-w-[280px]' : ''} group`}
                   >
-                    {/* Email particle effect */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
-                      {[...Array(6)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className="absolute w-1 h-1 bg-purple-400 rounded-full"
-                          style={{ 
-                            left: `${20 + i * 10}%`, 
-                            top: '50%' 
-                          }}
-                          animate={{
-                            y: [0, -15, 0],
-                            opacity: [0.3, 1, 0.3]
-                          }}
-                          transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            delay: i * 0.1,
-                            ease: 'easeInOut'
-                          }}
-                        />
-                      ))}
-                    </div>
-                    
-                    {/* Purple gradient background */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400"
-                      initial={{ scaleX: 0 }}
-                      whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.5, ease: 'easeOut' }}
-                      style={{ transformOrigin: 'left' }}
-                    />
-                    
-                    <span className="relative z-10 flex items-center">
-                      {showEmail ? (
-                        copied ? (
-                          <>
-                            <CheckCircle2 className="mr-2 h-4 w-4 text-green-400 animate-bounce" />
-                            <span className="text-green-400 font-bold">COPIED!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Mail className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
-                            adnansamir.d@gmail.com
-                          </>
-                        )
+                    {showEmail ? (
+                      copied ? (
+                        <>
+                          <CheckCircle2 className="mr-3 h-5 w-5 text-green-400 animate-bounce" />
+                          <span className="text-green-400 font-bold">COPIED!</span>
+                        </>
                       ) : (
                         <>
-                          <Mail className="mr-2 h-4 w-4 group-hover:rotate-y-180 transition-transform duration-500" /> 
-                          Contact Me
+                          <Mail className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                          adnansamir.d@gmail.com
                         </>
-                      )}
-                    </span>
-                  </motion.button>
+                      )
+                    ) : (
+                      <>
+                        <Mail className="mr-3 h-5 w-5 group-hover:rotate-12 transition-transform" /> 
+                        Contact Me
+                      </>
+                    )}
+                  </RedNeonButton>
                 </TooltipTrigger>
                 <TooltipContent className="glass-effect border-red-neon/30">
                   <p className="text-red-neon">{showEmail ? 'Click to copy' : 'Click to reveal email'}</p>
@@ -358,6 +231,13 @@ export default function Home() {
             >
               <Zap className="w-10 h-10 text-red-neon/40" />
             </motion.div>
+            <motion.div
+              className="absolute bottom-1/3 left-1/6"
+              animate={{ rotate: 180, y: [-15, 15, -15] }}
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Palette className="w-8 h-8 text-red-neon/35" />
+            </motion.div>
           </div>
         </div>
       </motion.section>
@@ -381,12 +261,27 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl font-black mb-6 gradient-text-title">
+          <h2 className="text-6xl font-black mb-6 neon-text gradient-text">
             MY PROJECTS
           </h2>
           <p className="text-xl text-white/70 max-w-3xl mx-auto">
             Cutting-edge web applications that push the boundaries of what&apos;s possible
           </p>
+        </motion.div>
+        
+        <motion.div 
+          className="flex justify-center mb-12"
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <RedNeonButton
+            variant={showClientsOnly ? "primary" : "secondary"}
+            onClick={() => setShowClientsOnly(!showClientsOnly)}
+            className="text-lg px-8 py-4"
+          >
+            {showClientsOnly ? 'Show All Projects' : 'Show Client Projects Only'}
+          </RedNeonButton>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -396,7 +291,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 50, rotateX: 45 }}
               whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
               transition={{ delay: index * 0.1, duration: 0.8 }}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -10 }}
             >
               <Enhanced3DCard 
                 className="h-full cursor-pointer"
@@ -459,11 +354,54 @@ export default function Home() {
       {/* Divider */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-red-neon/50 to-transparent" />
 
+      {/* Contact Section */}
+      <section id="contact" className="py-20 px-4 md:px-8 text-center relative z-10">
+        <Enhanced3DCard className="max-w-4xl mx-auto glass-effect">
+          <div className="p-12">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-6xl font-black mb-8 neon-text gradient-text">
+                LET&apos;S BUILD SOMETHING EPIC
+              </h2>
+              <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Ready to transform your vision into a digital masterpiece? 
+                Let&apos;s create something that will blow your clients away.
+              </p>
+              
+              <div className="flex gap-6 justify-center flex-wrap">
+                <RedNeonButton 
+                  variant="primary" 
+                  size="lg"
+                  onClick={handleEmailClick}
+                  className="group transform hover:scale-105"
+                >
+                  <Mail className="mr-3 h-6 w-6 group-hover:rotate-12 transition-transform" />
+                  Start Project
+                </RedNeonButton>
+                
+                <RedNeonButton 
+                  variant="secondary" 
+                  size="lg"
+                  onClick={() => window.open('https://github.com/adnansamirswe', '_blank')}
+                  className="group"
+                >
+                  <Github className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
+                  View Code
+                </RedNeonButton>
+              </div>
+            </motion.div>
+          </div>
+        </Enhanced3DCard>
+      </section>
+
       {/* Footer */}
       <footer className="py-8 text-center border-t border-red-neon/20 relative z-10">
         <p className="text-white/60">
-          © 2023 <span className="text-red-neon font-bold">Adnan_Samir</span>. 
-          Crafted with <span>React</span>
+          © 2025 <span className="text-red-neon font-bold">Adnan Samir</span>. 
+          Crafted with <span className="text-red-neon">❤️</span> and <span className="text-red-neon">React</span>
         </p>
       </footer>
     </div>
