@@ -6,8 +6,16 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
   const [letters, setLetters] = useState([]);
   const [asteroids, setAsteroids] = useState([]);
   const [destroyedLetters, setDestroyedLetters] = useState(new Set());
+  const [isOptimized, setIsOptimized] = useState(false);
   const containerRef = useRef(null);
   const letterRefs = useRef([]);
+
+  // Performance detection
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = window.devicePixelRatio < 2 || navigator.hardwareConcurrency < 4;
+    setIsOptimized(isMobile || isLowEnd);
+  }, []);
 
   // Initialize letters with positions
   useEffect(() => {
@@ -61,12 +69,18 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
       }
     };
 
-    // Spawn asteroids periodically
+    // Spawn asteroids periodically - reduced frequency for mobile
+    const spawnDelay = isOptimized ? 
+      (8000 + Math.random() * 6000) : // 8-14 seconds on mobile/low-end
+      (3000 + Math.random() * 4000);  // 3-7 seconds on desktop
+    
+    const adjustedAsteroidCount = isOptimized ? Math.min(asteroidCount, 1) : asteroidCount;
+    
     const asteroidTimer = setInterval(() => {
-      if (asteroids.length < asteroidCount) {
+      if (asteroids.length < adjustedAsteroidCount) {
         spawnAsteroid();
       }
-    }, 3000 + Math.random() * 4000); // Random spawn between 3-7 seconds
+    }, spawnDelay);
 
     return () => clearInterval(asteroidTimer);
   }, [letters, destroyedLetters, asteroidCount, asteroids.length]);
@@ -132,37 +146,44 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
     const letterElement = letterRefs.current[index];
     if (!letterElement) return;
 
-    // Create more dramatic fragments with different types
+    // Simplified fragments for performance - reduced on mobile
+    const mainCount = isOptimized ? 2 : 4;
+    const sparkCount = isOptimized ? 6 : 15;
+    const smokeCount = isOptimized ? 3 : 8;
+
     const fragments = [
       // Main character pieces - actual parts of the letter
-      ...Array.from({ length: 4 }, (_, i) => ({
+      ...Array.from({ length: mainCount }, (_, i) => ({
         id: `main-${i}`,
         x: 0,
         y: 0,
-        vx: (Math.random() - 0.5) * 400 + (i % 2 === 0 ? -100 : 100),
-        vy: (Math.random() - 0.5) * 300 - 150,
+        vx: (Math.random() - 0.5) * (isOptimized ? 200 : 400) + (i % 2 === 0 ? -50 : 50),
+        vy: (Math.random() - 0.5) * (isOptimized ? 150 : 300) - (isOptimized ? 75 : 150),
         opacity: 1,
-        size: Math.random() * 12 + 8,
+        size: Math.random() * (isOptimized ? 8 : 12) + (isOptimized ? 6 : 8),
         type: 'character',
         char: letters[index].char,
         rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 20
+        rotationSpeed: (Math.random() - 0.5) * (isOptimized ? 10 : 20)
       })),
       // Spark particles
-      ...Array.from({ length: 15 }, (_, i) => ({
+      ...Array.from({ length: sparkCount }, (_, i) => ({
         id: `spark-${i}`,
         x: (Math.random() - 0.5) * 10,
         y: (Math.random() - 0.5) * 10,
-        vx: (Math.random() - 0.5) * 500,
-        vy: (Math.random() - 0.5) * 500 - 200,
+        vx: (Math.random() - 0.5) * (isOptimized ? 250 : 500),
+        vy: (Math.random() - 0.5) * (isOptimized ? 250 : 500) - (isOptimized ? 100 : 200),
         opacity: 1,
         size: Math.random() * 3 + 1,
         type: 'spark',
         rotation: Math.random() * 360,
         life: 1
-      })),
-      // Smoke particles
-      ...Array.from({ length: 8 }, (_, i) => ({
+      }))
+    ];
+
+    // Only add smoke particles on desktop for performance
+    if (!isOptimized) {
+      fragments.push(...Array.from({ length: smokeCount }, (_, i) => ({
         id: `smoke-${i}`,
         x: (Math.random() - 0.5) * 20,
         y: (Math.random() - 0.5) * 20,
@@ -172,8 +193,8 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
         size: Math.random() * 15 + 10,
         type: 'smoke',
         rotation: Math.random() * 360
-      }))
-    ];
+      })));
+    }
 
     // Update letter state to show destruction process
     setLetters(prev => prev.map((letter, i) => 
@@ -254,7 +275,13 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       {/* Letters */}
-      <div className="relative z-10 flex flex-wrap justify-center">
+      <div className="relative z-10 flex flex-wrap justify-center" style={text === "ADNAN_SAMIR" ? {
+        // Override any CSS that might cause gradient effects
+        background: 'none',
+        backgroundImage: 'none',
+        WebkitBackgroundClip: 'initial',
+        backgroundClip: 'initial'
+      } : {}}>
         {letters.map((letter, index) => (
           <motion.span
             key={index}
@@ -263,19 +290,28 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
           >
             {/* Letter character - show during destruction phases */}
             <motion.span
-              className={`relative z-20 ${letter.isHighlighted ? 'text-red-neon' : 'text-white'}`}
+              className={`relative z-20 ${letter.isHighlighted ? 'text-red-neon' : text === "ADNAN_SAMIR" ? '' : 'text-white'}`}
               style={{
-                // Different styling for highlighted vs normal letters
-                color: letter.isHighlighted ? '#ff1744' : text === "ADNAN_SAMIR" ? '#cc1235' : '#ffffff',
+                // Force consistent red color with proper glow for main name
+                color: letter.isHighlighted ? '#ff1744' : text === "ADNAN_SAMIR" ? '#ff1744' : '#ffffff',
                 textShadow: letter.isHighlighted ? 
                   '0 0 15px #ff1744, 0 0 30px #ff1744, 0 0 45px #ff1744' :
                   text === "ADNAN_SAMIR" ? 
-                    '2px 2px 0px #000000, 4px 4px 0px #1a1a1a, 6px 6px 0px #333333, 0 0 15px #cc1235, 0 0 30px #cc1235, 0 0 45px #cc1235' :
+                    // Consistent red glow - no gradient, no color changing
+                    `0 0 10px #ff1744,
+                     0 0 20px #ff1744,
+                     0 0 30px rgba(255, 23, 68, 0.6),
+                     0 0 40px rgba(255, 23, 68, 0.4)` :
                     '0 0 12px rgba(255, 255, 255, 0.8), 0 0 24px rgba(255, 255, 255, 0.6), 0 0 36px rgba(255, 255, 255, 0.4)',
                 filter: text === "ADNAN_SAMIR" ? 
-                  'brightness(1.3)' : 
+                  'brightness(1.2)' : 
                   'brightness(1.3)',
-                fontWeight: text === "ADNAN_SAMIR" ? '600' : '300' // Reduced boldness for name
+                fontWeight: text === "ADNAN_SAMIR" ? '900' : '300',
+                // Override any gradient effects but keep text visible
+                background: 'none',
+                backgroundImage: 'none',
+                WebkitBackgroundClip: 'initial',
+                WebkitTextFillColor: 'initial'
               }}
               animate={{
                 // Only hide when completely destroyed, show during repair
@@ -288,12 +324,13 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
                 scale: letter.repairProgress > 0 && letter.repairProgress < 1 ? 
                   [0, 0.5, 1.2, 1] : 
                   letter.destructionPhase === 'impact' ? [1, 1.3, 1] :
-                  letter.destructionPhase === 'breaking' ? [1, 0.9] : 1,
+                  letter.destructionPhase === 'breaking' ? [1, 0.9] : 1, // Remove breathing effect
                 
                 // Shake effect during destruction
                 x: letter.destructionPhase === 'impact' ? [0, -2, 2, -1, 1, 0] :
                    letter.destructionPhase === 'breaking' ? [0, -1, 1, 0] : 0,
                 
+                // Subtle glow effects
                 textShadow: letter.repairProgress > 0 && letter.repairProgress < 1 ?
                   [
                     '0 0 5px #ff1744',
@@ -306,7 +343,8 @@ export default function AsteroidTargetedText({ text, className = "", asteroidCou
                 
                 filter: letter.repairProgress > 0 && letter.repairProgress < 1 ?
                   ['blur(5px)', 'blur(2px)', 'blur(0px)', 'blur(0px)'] : 
-                  letter.destructionPhase === 'breaking' ? 'blur(1px)' : 'blur(0px)'
+                  letter.destructionPhase === 'breaking' ? 'blur(1px)' : 
+                  'blur(0px)'
               }}
               transition={{ 
                 duration: letter.destructionPhase === 'impact' ? 0.1 : 

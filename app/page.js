@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { HoverCard, HoverCardTrigger} from "@/components/ui/hover-card";
 import { Badge } from "@/components/ui/badge";
-import { Github, Linkedin, Mail, CheckCircle2, MapPin, ExternalLink, Zap, Code, Palette } from "lucide-react";
+import { Github, Linkedin, Mail, CheckCircle2, MapPin, ExternalLink, Zap, Code, Palette, Download, FileText } from "lucide-react";
 import Red3DBackground from "@/components/Red3DBackground";
 import Enhanced3DCard from "@/components/Enhanced3DCard";
 import RedNeonButton from "@/components/RedNeonButton";
@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ScrollNav from "@/components/ScrollNav";
+import { getPerformanceLevel, getOptimizedAnimationProps, shouldSkipAnimation } from "@/lib/performance";
 
 const projects = [
     {
@@ -93,6 +94,19 @@ export default function Home() {
   const [copied, setCopied] = React.useState(false);
   const [showEmail, setShowEmail] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [performanceLevel, setPerformanceLevel] = React.useState('high');
+  // Initialize performance detection
+  React.useEffect(() => {
+    setPerformanceLevel(getPerformanceLevel());
+  }, []);
+
+  const handleCvDownload = () => {
+    // Create download link
+    const link = document.createElement('a');
+    link.href = '/Adnan_Samir_CV.pdf';
+    link.download = 'Adnan_Samir_CV.pdf';
+    link.click();
+  };
 
   const handleEmailClick = async () => {
     if (!showEmail) {
@@ -183,35 +197,37 @@ export default function Home() {
             <motion.button
               onClick={() => window.open('https://github.com/adnansamirswe', '_blank')}
               className="group relative overflow-hidden bg-transparent border-2 border-red-neon text-red-neon hover:text-white font-bold px-6 py-2.5 text-base rounded-xl transition-all duration-500 cursor-pointer"
-              whileHover={{ 
+              whileHover={performanceLevel !== 'low' ? { 
                 scale: 1.05, 
                 y: -3,
                 boxShadow: '0 25px 50px rgba(255, 23, 68, 0.4), 0 0 80px rgba(255, 23, 68, 0.3)'
-              }}
+              } : { scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Matrix rain effect on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute text-green-400 text-xs font-mono"
-                    style={{ left: `${i * 12.5}%`, top: '-20px' }}
-                    animate={{
-                      y: ['-20px', '80px'],
-                      opacity: [0, 1, 0]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: i * 0.2,
-                      ease: 'linear'
-                    }}
-                  >
-                    {Math.random() > 0.5 ? '1' : '0'}
-                  </motion.div>
-                ))}
-              </div>
+              {/* Matrix rain effect on hover - Skip on low performance */}
+              {!shouldSkipAnimation('complex', performanceLevel) && (
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
+                  {[...Array(performanceLevel === 'medium' ? 4 : 8)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute text-green-400 text-xs font-mono"
+                      style={{ left: `${i * (100 / (performanceLevel === 'medium' ? 4 : 8))}%`, top: '-20px' }}
+                      animate={{
+                        y: ['-20px', '80px'],
+                        opacity: [0, 1, 0]
+                      }}
+                      transition={{
+                        duration: performanceLevel === 'medium' ? 3 : 2,
+                        repeat: Infinity,
+                        delay: i * 0.3,
+                        ease: 'linear'
+                      }}
+                    >
+                      {Math.random() > 0.5 ? '1' : '0'}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
               
               {/* Background color transition */}
               <motion.div
@@ -231,26 +247,28 @@ export default function Home() {
             <motion.button
               onClick={() => window.open('https://www.linkedin.com/in/adnan-samir-8887562a2/', '_blank')}
               className="group relative overflow-hidden bg-transparent border-2 border-blue-400 text-blue-400 hover:text-white font-bold px-6 py-2.5 text-base rounded-xl transition-all duration-500 cursor-pointer"
-              whileHover={{ 
+              whileHover={performanceLevel !== 'low' ? { 
                 scale: 1.05, 
                 y: -3,
                 boxShadow: '0 25px 50px rgba(59, 130, 246, 0.4), 0 0 80px rgba(59, 130, 246, 0.3)'
-              }}
+              } : { scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              {/* Professional ripple effect */}
-              <motion.div
-                className="absolute inset-0 rounded-xl border-2 border-blue-400"
-                animate={{
-                  scale: [1, 1.2, 1.4],
-                  opacity: [0.5, 0.2, 0]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeOut'
-                }}
-              />
+              {/* Professional ripple effect - Skip on low performance */}
+              {!shouldSkipAnimation('complex', performanceLevel) && (
+                <motion.div
+                  className="absolute inset-0 rounded-xl border-2 border-blue-400"
+                  animate={{
+                    scale: [1, 1.2, 1.4],
+                    opacity: [0.5, 0.2, 0]
+                  }}
+                  transition={{
+                    duration: performanceLevel === 'medium' ? 3 : 2,
+                    repeat: Infinity,
+                    ease: 'easeOut'
+                  }}
+                />
+              )}
               
               {/* LinkedIn blue gradient */}
               <motion.div
@@ -273,36 +291,38 @@ export default function Home() {
                   <motion.button
                     onClick={handleEmailClick}
                     className={`group relative overflow-hidden bg-transparent border-2 border-purple-400 text-purple-400 hover:text-white font-bold px-6 py-2.5 text-base rounded-xl transition-all duration-500 cursor-pointer ${showEmail ? 'min-w-[250px]' : ''}`}
-                    whileHover={{ 
+                    whileHover={performanceLevel !== 'low' ? { 
                       scale: 1.05, 
                       y: -3,
                       boxShadow: '0 25px 50px rgba(168, 85, 247, 0.4), 0 0 80px rgba(168, 85, 247, 0.3)'
-                    }}
+                    } : { scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    {/* Email particle effect */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
-                      {[...Array(6)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className="absolute w-1 h-1 bg-purple-400 rounded-full"
-                          style={{ 
-                            left: `${20 + i * 10}%`, 
-                            top: '50%' 
-                          }}
-                          animate={{
-                            y: [0, -15, 0],
-                            opacity: [0.3, 1, 0.3]
-                          }}
-                          transition={{
-                            duration: 1.5,
-                            repeat: Infinity,
-                            delay: i * 0.1,
-                            ease: 'easeInOut'
-                          }}
-                        />
-                      ))}
-                    </div>
+                    {/* Email particle effect - Skip on low performance */}
+                    {!shouldSkipAnimation('particle', performanceLevel) && (
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500">
+                        {[...Array(performanceLevel === 'medium' ? 4 : 6)].map((_, i) => (
+                          <motion.div
+                            key={i}
+                            className="absolute w-1 h-1 bg-purple-400 rounded-full"
+                            style={{ 
+                              left: `${20 + i * (60 / (performanceLevel === 'medium' ? 4 : 6))}%`, 
+                              top: '50%' 
+                            }}
+                            animate={{
+                              y: [0, -15, 0],
+                              opacity: [0.3, 1, 0.3]
+                            }}
+                            transition={{
+                              duration: performanceLevel === 'medium' ? 2 : 1.5,
+                              repeat: Infinity,
+                              delay: i * 0.15,
+                              ease: 'easeInOut'
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
                     
                     {/* Purple gradient background */}
                     <motion.div
@@ -340,25 +360,99 @@ export default function Home() {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+
+            {/* CV Download Button - Professional Document Effect */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.button
+                    onClick={handleCvDownload}
+                    className="group relative overflow-hidden bg-transparent border-2 border-green-400 text-green-400 hover:text-white font-bold px-6 py-2.5 text-base rounded-xl transition-all duration-500 cursor-pointer"
+                    whileHover={performanceLevel !== 'low' ? { 
+                      scale: 1.05, 
+                      y: -3,
+                      boxShadow: '0 25px 50px rgba(34, 197, 94, 0.4), 0 0 80px rgba(34, 197, 94, 0.3)'
+                    } : { scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {/* Document floating effect - Skip on low performance */}
+                    {!shouldSkipAnimation('particle', performanceLevel) && (
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-40 transition-opacity duration-500">
+                        {[...Array(performanceLevel === 'medium' ? 3 : 5)].map((_, i) => (
+                          <motion.div
+                            key={i}
+                            className="absolute text-green-300 text-xs"
+                            style={{ 
+                              left: `${15 + i * (70 / (performanceLevel === 'medium' ? 3 : 5))}%`, 
+                              top: '20%' 
+                            }}
+                            animate={{
+                              y: [0, -10, 0],
+                              opacity: [0.3, 1, 0.3],
+                              rotate: [0, 5, 0]
+                            }}
+                            transition={{
+                              duration: performanceLevel === 'medium' ? 2.5 : 2,
+                              repeat: Infinity,
+                              delay: i * 0.2,
+                              ease: 'easeInOut'
+                            }}
+                          >
+                            <FileText className="w-3 h-3" />
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Green gradient background */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-green-600 via-green-500 to-green-400"
+                      initial={{ scaleY: 0 }}
+                      whileHover={{ scaleY: 1 }}
+                      transition={{ duration: 0.5, ease: 'easeOut' }}
+                      style={{ transformOrigin: 'bottom' }}
+                    />
+                    
+                    <span className="relative z-10 flex items-center">
+                      <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
+                      Download CV
+                    </span>
+                  </motion.button>
+                </TooltipTrigger>
+                <TooltipContent className="glass-effect border-green-400/30">
+                  <p className="text-green-400">Click to download my resume</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </motion.div>
 
-          {/* Floating Icons */}
-          <div className="absolute inset-0 pointer-events-none">
-            <motion.div
-              className="absolute top-1/4 left-1/4"
-              animate={{ rotate: 360, y: [-20, 20, -20] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Code className="w-12 h-12 text-red-neon/30" />
-            </motion.div>
-            <motion.div
-              className="absolute top-1/3 right-1/4"
-              animate={{ rotate: -360, y: [20, -20, 20] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Zap className="w-10 h-10 text-red-neon/40" />
-            </motion.div>
-          </div>
+          {/* Floating Icons - Skip on low performance */}
+          {!shouldSkipAnimation('float', performanceLevel) && (
+            <div className="absolute inset-0 pointer-events-none">
+              <motion.div
+                className="absolute top-1/4 left-1/4"
+                animate={{ rotate: 360, y: [-20, 20, -20] }}
+                transition={{ 
+                  duration: performanceLevel === 'low' ? 12 : 8, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              >
+                <Code className="w-12 h-12 text-red-neon/30" />
+              </motion.div>
+              <motion.div
+                className="absolute top-1/3 right-1/4"
+                animate={{ rotate: -360, y: [20, -20, 20] }}
+                transition={{ 
+                  duration: performanceLevel === 'low' ? 10 : 6, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              >
+                <Zap className="w-10 h-10 text-red-neon/40" />
+              </motion.div>
+            </div>
+          )}
         </div>
       </motion.section>
 

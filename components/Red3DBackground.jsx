@@ -9,7 +9,16 @@ const Red3DBackground = () => {
 
   const initParticles = useCallback((canvas) => {
     const particles = [];
-    const particleCount = 80; // Reduced for better performance
+    // Dynamic particle count based on device performance
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = window.devicePixelRatio < 2 || navigator.hardwareConcurrency < 4;
+    
+    let particleCount = 80; // Desktop default
+    if (isMobile) {
+      particleCount = isLowEnd ? 15 : 25; // Much fewer for mobile
+    } else if (isLowEnd) {
+      particleCount = 40; // Reduced for low-end desktop
+    }
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -28,12 +37,28 @@ const Red3DBackground = () => {
   }, []);
 
   const animate = useCallback((canvas, ctx, particles) => {
+    // Skip frames on low-end devices for better performance
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = window.devicePixelRatio < 2 || navigator.hardwareConcurrency < 4;
+    const frameSkip = (isMobile && isLowEnd) ? 2 : 1;
+    
+    if (!animate.frameCount) animate.frameCount = 0;
+    animate.frameCount++;
+    
+    if (animate.frameCount % frameSkip !== 0) {
+      animationRef.current = requestAnimationFrame(() => animate(canvas, ctx, particles));
+      return;
+    }
+
     // Optimized clear with fade effect
     ctx.fillStyle = 'rgba(10, 10, 10, 0.08)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const time = Date.now() * 0.001;
 
+    // Batch particle updates for better performance
+    const particleUpdates = [];
+    
     particles.forEach((particle, index) => {
       // Update particle position with smoother movement
       particle.x += particle.vx;
@@ -55,44 +80,58 @@ const Red3DBackground = () => {
       const y2d = particle.y * scale + canvas.height / 2 * (1 - scale);
       const size2d = particle.size * scale;
 
-      // Pulsing opacity effect
-      const pulseOpacity = particle.opacity * (0.7 + 0.3 * Math.sin(particle.pulse));
+      // Store for rendering
+      particleUpdates.push({ x2d, y2d, size2d, scale, particle, index });
+    });
 
-      // Enhanced gradient with better colors
-      const gradient = ctx.createRadialGradient(x2d, y2d, 0, x2d, y2d, size2d * 4);
-      gradient.addColorStop(0, `rgba(255, 23, 68, ${pulseOpacity * scale})`);
-      gradient.addColorStop(0.3, `rgba(255, 69, 105, ${pulseOpacity * scale * 0.7})`);
-      gradient.addColorStop(0.7, `rgba(255, 0, 0, ${pulseOpacity * scale * 0.3})`);
-      gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+    // Render all particles
+    particleUpdates.forEach(({ x2d, y2d, size2d, scale, particle, index }) => {
+      // Pulsing opacity effect - simplified for performance
+      const pulseOpacity = particle.opacity * (0.8 + 0.2 * Math.sin(particle.pulse));
 
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(x2d, y2d, size2d * 4, 0, Math.PI * 2);
-      ctx.fill();
+      // Simplified gradient for mobile devices
+      if (isMobile) {
+        ctx.fillStyle = `rgba(255, 23, 68, ${pulseOpacity * scale * 0.6})`;
+        ctx.beginPath();
+        ctx.arc(x2d, y2d, size2d * 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Enhanced gradient for desktop
+        const gradient = ctx.createRadialGradient(x2d, y2d, 0, x2d, y2d, size2d * 4);
+        gradient.addColorStop(0, `rgba(255, 23, 68, ${pulseOpacity * scale})`);
+        gradient.addColorStop(0.3, `rgba(255, 69, 105, ${pulseOpacity * scale * 0.7})`);
+        gradient.addColorStop(0.7, `rgba(255, 0, 0, ${pulseOpacity * scale * 0.3})`);
+        gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
 
-      // Optimized connection lines (reduced frequency)
-      if (index % 3 === 0) { // Only check every 3rd particle
-        particles.slice(index + 1, index + 5).forEach((other) => { // Limit connections
-          const otherScale = 800 / (800 + other.z);
-          const otherX2d = other.x * otherScale + canvas.width / 2 * (1 - otherScale);
-          const otherY2d = other.y * otherScale + canvas.height / 2 * (1 - otherScale);
-          
-          const distance = Math.sqrt(
-            Math.pow(x2d - otherX2d, 2) + Math.pow(y2d - otherY2d, 2)
-          );
-
-          if (distance < 120 && particle.z < 400 && other.z < 400) {
-            const lineOpacity = (1 - distance / 120) * 0.25 * scale * otherScale;
-            ctx.strokeStyle = `rgba(255, 23, 68, ${lineOpacity})`;
-            ctx.lineWidth = 0.8;
-            ctx.beginPath();
-            ctx.moveTo(x2d, y2d);
-            ctx.lineTo(otherX2d, otherY2d);
-            ctx.stroke();
-          }
-        });
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x2d, y2d, size2d * 4, 0, Math.PI * 2);
+        ctx.fill();
       }
     });
+
+    // Connection lines - only for desktop and reduced frequency
+    if (!isMobile) {
+      particleUpdates.forEach(({ x2d, y2d, scale, particle, index }) => {
+        if (index % 4 === 0) { // Further reduced frequency
+          particleUpdates.slice(index + 1, index + 3).forEach((other) => { // Fewer connections
+            const distance = Math.sqrt(
+              Math.pow(x2d - other.x2d, 2) + Math.pow(y2d - other.y2d, 2)
+            );
+
+            if (distance < 100 && particle.z < 400 && other.particle.z < 400) {
+              const lineOpacity = (1 - distance / 100) * 0.2 * scale * other.scale;
+              ctx.strokeStyle = `rgba(255, 23, 68, ${lineOpacity})`;
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(x2d, y2d);
+              ctx.lineTo(other.x2d, other.y2d);
+              ctx.stroke();
+            }
+          });
+        }
+      });
+    }
 
     animationRef.current = requestAnimationFrame(() => animate(canvas, ctx, particles));
   }, []);
@@ -137,7 +176,7 @@ const Red3DBackground = () => {
       
       {/* Optimized floating 3D cubes */}
       <div className="fixed inset-0 pointer-events-none z-1 overflow-hidden">
-        {[...Array(4)].map((_, i) => (
+        {[...Array(window.innerWidth < 768 ? 2 : 4)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-8 h-8 border border-red-neon/20 gpu-optimized"

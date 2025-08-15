@@ -5,25 +5,42 @@ import { useState, useEffect } from "react";
 export default function MouseTrail() {
   const [trails, setTrails] = useState([]);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isEnabled, setIsEnabled] = useState(true);
 
   useEffect(() => {
+    // Performance detection - disable on low-end devices
+    const isMobile = window.innerWidth < 768;
+    const isLowEnd = window.devicePixelRatio < 2 || navigator.hardwareConcurrency < 4;
+    
+    if (isMobile || isLowEnd) {
+      setIsEnabled(false);
+      return;
+    }
+
     let trailId = 0;
+    let lastTrailTime = 0;
+    const throttleDelay = 50; // Limit to ~20fps for trail creation
 
     const handleMouseMove = (e) => {
+      const now = Date.now();
+      if (now - lastTrailTime < throttleDelay) return;
+      lastTrailTime = now;
+
       setMousePosition({ x: e.clientX, y: e.clientY });
 
-      // Create new trail particles
-      const newTrails = Array.from({ length: 3 }, (_, i) => ({
+      // Reduce particle count and complexity for performance
+      const particleCount = Math.random() > 0.5 ? 2 : 1; // Random 1-2 particles instead of 3
+      const newTrails = Array.from({ length: particleCount }, (_, i) => ({
         id: trailId++,
-        x: e.clientX + (Math.random() - 0.5) * 20,
-        y: e.clientY + (Math.random() - 0.5) * 20,
-        delay: i * 0.05,
-        size: Math.random() * 6 + 4,
-        opacity: Math.random() * 0.8 + 0.2,
-        type: Math.random() > 0.7 ? 'spark' : 'particle'
+        x: e.clientX + (Math.random() - 0.5) * 15, // Reduced spread
+        y: e.clientY + (Math.random() - 0.5) * 15,
+        delay: i * 0.03, // Reduced delay
+        size: Math.random() * 4 + 3, // Smaller particles
+        opacity: Math.random() * 0.6 + 0.3,
+        type: Math.random() > 0.8 ? 'spark' : 'particle' // Fewer sparks
       }));
 
-      setTrails(prev => [...prev, ...newTrails].slice(-50)); // Keep only last 50 particles
+      setTrails(prev => [...prev, ...newTrails].slice(-30)); // Keep fewer particles
     };
 
     const handleMouseEnter = () => {
@@ -39,10 +56,10 @@ export default function MouseTrail() {
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mousemove', handleMouseMove);
 
-    // Clean up old trails
+    // Clean up old trails less frequently for performance
     const cleanupInterval = setInterval(() => {
-      setTrails(prev => prev.slice(-30));
-    }, 2000);
+      setTrails(prev => prev.slice(-20));
+    }, 3000);
 
     return () => {
       document.removeEventListener('mouseenter', handleMouseEnter);
@@ -51,6 +68,11 @@ export default function MouseTrail() {
       clearInterval(cleanupInterval);
     };
   }, []);
+
+  // Early return if disabled for performance
+  if (!isEnabled) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">

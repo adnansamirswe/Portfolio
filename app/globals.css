@@ -330,6 +330,36 @@ body::before {
   will-change: auto;
 }
 
+/* Enhanced GPU acceleration for animations */
+.motion-element {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.animation-heavy {
+  contain: layout style paint;
+  will-change: transform, opacity;
+}
+
+/* Optimize expensive operations */
+.framer-motion {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Reduce repaints and reflows */
+.no-reflow {
+  contain: layout;
+}
+
+/* Performance hints for particle systems */
+.particle-container {
+  contain: strict;
+  will-change: transform;
+  isolation: isolate;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .card-3d:hover {
@@ -338,17 +368,37 @@ body::before {
   
   .neon-text {
     font-size: clamp(2rem, 8vw, 4rem);
-    animation-duration: 4s; /* Slower on mobile for better performance */
+    animation-duration: 6s; /* Slower on mobile for better performance */
   }
   
   /* Reduce motion for mobile performance */
   .float-animation {
-    animation-duration: 12s;
+    animation-duration: 16s;
   }
   
   /* Simplify 3D effects on mobile */
   .gpu-optimized {
-    transform: none;
+    transform: translateZ(0); /* Keep GPU acceleration but reduce complexity */
+  }
+  
+  /* Disable complex hover effects on mobile */
+  .motion-element {
+    will-change: auto;
+  }
+  
+  /* Reduce particle effects on mobile */
+  .particle-container {
+    contain: layout;
+  }
+  
+  /* Simplify gradients on mobile */
+  .gradient-text,
+  .gradient-text-title {
+    background: var(--red-neon);
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: initial;
+    animation: none;
   }
 }
 
