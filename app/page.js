@@ -33,6 +33,14 @@ const projects = [
     client: false
   },
   {
+    title: "Arofume - Sales Order Tracker",
+    description: "Track and note sales orders for Arofume. Built with React.js and Firebase Firestore for real-time order management.",
+    image: "/salesmanage.png", // Add a preview image to public/ if available
+    tech: ["React.js", "Firebase Firestore", "Vercel"],
+    link: "https://arofume.vercel.app/",
+    client: true
+  },
+  {
     title: "Visiotec Alchemy",
     description: "IT solutions agency platform with a modern stack. Cloudflare D1 SQL backend, Node.js API, Vite + React + TypeScript + TailwindCSS frontend.",
     image: "/visiotecalchemy-preview.png",

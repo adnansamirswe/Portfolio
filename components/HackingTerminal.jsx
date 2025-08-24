@@ -186,13 +186,15 @@ export default function HackingTerminal() {
                   </span>
                 </div>
                 
-                {/* GPS Coordinates */}
+                {/* GPS Coordinates - commented out */}
+                {/**
                 <div className="flex items-center gap-2">
                   <span className="text-white/70 text-xs font-mono">GPS:</span>
                   <span className="text-purple-400 text-xs font-mono">
                     {ipInfo.loc}
                   </span>
                 </div>
+                */}
               </motion.div>
             )}
           </motion.div>
